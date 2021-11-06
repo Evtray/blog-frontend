@@ -1,0 +1,14 @@
+.app-mw {
+  max-width: 1250px;
+  margin: auto;
+}
+.feed-mw {
+  max-width: 900px;
+  margin: auto;
+}
+html, body {
+  background-color: rgb(246, 246, 246) !important;
+}
+a {
+  text-decoration: none !important;
+}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/2afef9cfdb.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="../css/main.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+
+    <title>Evitra</title>
+</head>
+
+<body>
+    <noscript>
+        <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+                Please enable it to continue.</strong>
+    </noscript>
+    <div id="app" class="">
+        <appheader></appheader>
+        <div v-if="view" class="feed-mw">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home"
+                        type="button" role="tab" aria-controls="nav-home" aria-selected="true">Usuarios</button>
+                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
+                        type="button" role="tab" aria-controls="nav-profile"
+                        aria-selected="false">Publicaciones</button>
+                </div>
+            </nav>
+            <div class="tab-content bg-white shadow-sm rounded" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <div class="text-end p-2">
+                        <button type="button" class="btn btn-danger text-white mx-2" @click="exportUsers()">
+                            Exportar PDF
+                        </button>
+                        <button type="button" class="btn btn-info text-white" data-bs-toggle="modal"
+                            data-bs-target="#modalLoad" @click="typeLoad = 'usuario'">
+                            Carga masiva
+                        </button>
+                    </div>
+                    <div id="content-users">
+                        <!-- <div class="p-4" style="width: 400px;height: 400px">
+                            <line-chart :chartdata="chartData" :options="chartOptions" />
+                        </div> -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Usuario</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Género</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in users" :key="index">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.username }}</td>
+                                    <td>{{ item.email }}</td>
+                                    <td>{{ item.gender }}</td>
+                                    <td style="width: 100px;">
+                                        <div class="d-flex">
+                                            <button class="btn text-muted" data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate"
+                                                @click="prepareUpdate('usuario', item, index)"><i
+                                                    class="far fa-eye"></i></button>
+                                            <button class="btn text-muted" data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate"
+                                                @click="prepareUpdate('usuario', item, index)"><i
+                                                    class="far fa-edit"></i></button>
+                                            <button class="btn text-danger" data-bs-toggle="modal"
+                                                data-bs-target="#modalDelete"
+                                                @click="prepareDelete('usuario', index)"><i
+                                                    class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                    <div class="text-end p-2">
+                        <button type="button" class="btn btn-danger text-white mx-2" @click="exportPosts()">
+                            Exportar PDF
+                        </button>
+                        <button type="button" class="btn btn-info text-white" data-bs-toggle="modal"
+                            data-bs-target="#modalLoad" @click="typeLoad = 'post'">
+                            Carga masiva
+                        </button>
+                    </div>
+                    <div id="content-posts">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Usuario</th>
+                                    <th scope="col">url</th>
+                                    <th scope="col">Categoría</th>
+                                    <th scope="col">Fecha</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in posts" :key="index">
+                                    <td style="width: 150px;">{{ item.author }}</td>
+                                    <td>{{ item.url }}</td>
+                                    <td style="width: 110px;">{{ item.category }}</td>
+                                    <td style="width: 110px;">{{ item.date }}</td>
+                                    <td style="width: 100px;">
+                                        <div class="d-flex">
+                                            <button class="btn text-muted" data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate"
+                                                @click="prepareUpdate('post', item, index)"><i
+                                                    class="far fa-eye"></i></button>
+                                            <button class="btn text-muted" data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate"
+                                                @click="prepareUpdate('post', item, index)"><i
+                                                    class="far fa-edit"></i></button>
+                                            <button class="btn text-danger" data-bs-toggle="modal"
+                                                data-bs-target="#modalDelete" @click="prepareDelete('post', index)"><i
+                                                    class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalLoadLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLoadLabel">Eliminar</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group mb-3">
+                                <label for="">¿Estás seguro de eliminar el {{typeDelete}}?</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="closemodal" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                :disabled="loadDelete">Cancelar</button>
+                            <button type="button" class="btn btn-danger text-white" @click="deleteItem()"
+                                :disabled="loadDelete">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalUpdate" tabindex="-1" aria-labelledby="modalLoadLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Actualizar {{typeUpdate}}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div v-if="typeUpdate == 'post'">
+                                <div class="">
+                                    <label class="mb-2">Tipo de media</label>
+                                    <div class="form-check">
+                                        <input v-model="item.type" value="image" class="form-check-input" type="radio"
+                                            name="typeMedia" id="typeImage">
+                                        <label class="form-check-label" for="typeImage">
+                                            Imagen
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input v-model="item.type" value="video" class="form-check-input" type="radio"
+                                            name="typeMedia" id="typeVideo">
+                                        <label class="form-check-label" for="typeVideo">
+                                            Video
+                                        </label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Url</label>
+                                        <input v-model="item.url" type="text" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Categoría</label>
+                                        <input v-model="item.category" type="text" class="form-control">
+                                    </div>
+                                    <div v-if="alert" class="bg-danger p-2 text-white bg-opacity-50 my-2 rounded">
+                                        <span>Rellena todos los campos</span>
+                                    </div>
+                                    <div v-if="success" class="bg-success p-2 text-white bg-opacity-50 my-2 rounded">
+                                        <span>Información actualizada</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <input v-model="item.name" type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Género</label>
+                                    <div class="form-check">
+                                        <input v-model="item.gender" value="M" class="form-check-input" type="radio"
+                                            name="gender" id="male">
+                                        <label class="form-check-label" for="male">
+                                            M
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input v-model="item.gender" value="F" class="form-check-input" type="radio"
+                                            name="gender" id="female">
+                                        <label class="form-check-label" for="female">
+                                            F
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre de usuario</label>
+                                    <input v-model="item.username" type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email address</label>
+                                    <input v-model="item.email" type="email" class="form-control">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Password</label>
+                                    <input v-model="item.password" type="password" class="form-control">
+                                </div>
+                                <div v-if="alert" class="bg-danger p-2 text-white bg-opacity-50 my-2 rounded">
+                                    <span>Rellena todos los campos</span>
+                                </div>
+                                <div v-if="alertUsername" class="bg-danger p-2 text-white bg-opacity-50 my-2 rounded">
+                                    <span>Username ya registrado</span>
+                                </div>
+                                <div v-if="alertPassword" class="bg-danger p-2 text-white bg-opacity-50 my-2 rounded">
+                                    <span>La contraseña debe tener más de 7 carácteres</span>
+                                </div>
+                                <div v-if="alertEmail" class="bg-danger p-2 text-white bg-opacity-50 my-2 rounded">
+                                    <span>Ingresa una email valido</span>
+                                </div>
+                                <div v-if="success" class="bg-success p-2 text-white bg-opacity-50 my-2 rounded">
+                                    <span>Información actualizada</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="closemodal" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                :disabled="loadUpdate">Cancelar</button>
+                            <button type="button" class="btn btn-info text-white" @click="updateItem"
+                                :disabled="loadUpdate">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalLoad" tabindex="-1" aria-labelledby="modalLoadLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLoadLabel">Carga masiva, {{ typeLoad }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" id="fileLoadMain">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="closemodal" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                :disabled="loadLoad">Cancelar</button>
+                            <button type="button" class="btn btn-info text-white" @click="loadItems"
+                                :disabled="loadLoad">Cargar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/html2pdf.js-master/dist/html2pdf.bundle.min.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/header.js"></script>
+
+    <script>
+        app.mount("#app");
+    </script>
+</body>
+
+</html>
