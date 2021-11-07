@@ -98,7 +98,7 @@ const app = createApp({
 
           this.makeChartPosts(
             values.map((value) => {
-              return value.category;
+              return `${value.author}-${value.category}`;
             }),
             values.map((value) => {
               return value.likes.length;
@@ -187,6 +187,9 @@ const app = createApp({
       let validate = true;
       for (let key in this.item) {
         if (Array.isArray(this.item[key])) {
+          continue;
+        }
+        if (key == "posts") {
           continue;
         }
         if (this.item[key] == "") {
