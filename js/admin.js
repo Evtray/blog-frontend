@@ -15,7 +15,7 @@ const app = createApp({
       loadDelete: false,
       loadUpdate: false,
       loadLoad: false,
-      url: "https://ublog-backend.herokuapp.com/",
+      url: "http://127.0.0.1:5000/",
       typeDelete: "post",
       itemDelete: 0,
 
@@ -44,6 +44,8 @@ const app = createApp({
         responsive: true,
         maintainAspectRatio: false,
       },
+      myChartUsers: null,
+      myChartPosts: null,
     };
   },
   mounted() {
@@ -64,6 +66,18 @@ const app = createApp({
         .then(({ data }) => {
           this.users = data;
           this.users.splice(0, 1);
+
+          const values = this.users
+            .sort((a, b) => b.posts - a.posts)
+            .slice(0, 5);
+          this.makeChartUsers(
+            values.map((value) => {
+              return value.name;
+            }),
+            values.map((value) => {
+              return value.posts;
+            })
+          );
         })
         .catch(() => {
           console.log("Error");
@@ -78,6 +92,18 @@ const app = createApp({
         .get(`${this.url}posts`)
         .then(({ data }) => {
           this.posts = data;
+          let values = data
+            .sort((a, b) => b.likes.length - a.likes.length)
+            .slice(0, 5);
+
+          this.makeChartPosts(
+            values.map((value) => {
+              return value.category;
+            }),
+            values.map((value) => {
+              return value.likes.length;
+            })
+          );
         })
         .catch(() => {
           console.log("Error");
@@ -94,6 +120,64 @@ const app = createApp({
       this.typeUpdate = type;
       this.itemUpdate = index;
       this.item = item;
+    },
+    makeChartUsers(labels, data) {
+      const ctx = document.getElementById("chartUsers").getContext("2d");
+      const myChartUsers = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "My First Dataset",
+              data: data,
+              backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(54, 162, 235)",
+                "rgb(255, 205, 86)",
+              ],
+              hoverOffset: 4,
+            },
+          ],
+        },
+      });
+    },
+    makeChartPosts(labels, data) {
+      const ctx = document.getElementById("chartPosts").getContext("2d");
+      const myChartPosts = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "# Posts con mas likes",
+              data: data,
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
+                "rgba(255, 206, 86, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+              ],
+              borderColor: [
+                "rgba(255, 99, 132, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+              ],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
     },
     updateItem() {
       this.alert = false;

@@ -10,7 +10,7 @@ const app = createApp({
         email: "",
         password: "",
       },
-      url: "https://ublog-backend.herokuapp.com/",
+      url: "http://127.0.0.1:5000/",
       load: false,
       alert: false,
       alertUsername: false,

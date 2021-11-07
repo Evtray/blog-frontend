@@ -8,7 +8,7 @@ const app = createApp({
         url: "",
         category: "",
       },
-      url: "https://ublog-backend.herokuapp.com/",
+      url: "http://127.0.0.1:5000/",
       load: false,
       alert: false,
     };
@@ -32,6 +32,7 @@ const app = createApp({
         let localUser = JSON.parse(localStorage.getItem("user"));
 
         this.post.author = localUser.name;
+        this.post.userId = localUser.id;
         axios
           .post(`${this.url}new-post`, this.post)
           .then(({ data }) => {
