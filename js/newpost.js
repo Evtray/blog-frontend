@@ -35,7 +35,7 @@ const app = createApp({
         axios
           .post(`${this.url}new-post`, this.post)
           .then(({ data }) => {
-            window.location = "/frontend/views/Main.html";
+            window.location = "/views/Main.html";
           })
           .catch(() => {
             console.log("Error");

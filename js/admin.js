@@ -49,7 +49,7 @@ const app = createApp({
   mounted() {
     let localType = localStorage.getItem("type");
     if (localType == "user") {
-      window.location = "/frontend/views/Main.html";
+      window.location = "/views/Main.html";
     } else {
       this.view = true;
       this.getUsers();

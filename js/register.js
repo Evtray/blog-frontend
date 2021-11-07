@@ -21,7 +21,7 @@ const app = createApp({
   mounted() {
     let localUser = JSON.parse(localStorage.getItem("user"));
     if (localUser != null) {
-      window.location = "/frontend/views/Main.html";
+      window.location = "/views/Main.html";
     }
   },
   methods: {
@@ -58,7 +58,7 @@ const app = createApp({
               this.alertUsername = true;
             } else {
               localStorage.setItem("user", JSON.stringify(data.user));
-              window.location = "/frontend/views/Main.html";
+              window.location = "/views/Main.html";
               localStorage.setItem("type", "user");
             }
           })

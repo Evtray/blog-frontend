@@ -16,7 +16,7 @@ const app = createApp({
   mounted() {
     let localUser = JSON.parse(localStorage.getItem("user"));
     if (localUser != null) {
-      window.location = "/frontend/views/Main.html";
+      window.location = "/views/Main.html";
     }
   },
   methods: {
@@ -41,7 +41,7 @@ const app = createApp({
             if (data.status == 200) {
               localStorage.setItem("user", JSON.stringify(data.user));
               localStorage.setItem("type", data.type);
-              window.location = `/frontend/views/${
+              window.location = `/views/${
                 data.type == "admin" ? "Admin" : "Main"
               }.html`;
             }
