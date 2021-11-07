@@ -15,7 +15,7 @@ const app = createApp({
       loadDelete: false,
       loadUpdate: false,
       loadLoad: false,
-      url: "http://127.0.0.1:5000/",
+      url: "https://ublog-backend.herokuapp.com/",
       typeDelete: "post",
       itemDelete: 0,
 
