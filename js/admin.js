@@ -65,8 +65,6 @@ const app = createApp({
         .get(`${this.url}users`)
         .then(({ data }) => {
           this.users = data;
-          this.users.splice(0, 1);
-
           const values = this.users
             .sort((a, b) => b.posts - a.posts)
             .slice(0, 5);
